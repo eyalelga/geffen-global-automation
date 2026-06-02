@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הצעת אוטומציה – גפן גלובל</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Heebo', sans-serif; background: #f5f4f0; color: #1a1a1a; direction: rtl; }
+
+  .page { max-width: 820px; margin: 0 auto; padding: 40px 24px 60px; }
+
+  /* Header */
+  .header { margin-bottom: 48px; }
+  .badge { display: inline-block; font-size: 12px; background: #d4f0e4; color: #0a5e3f; border-radius: 20px; padding: 5px 16px; margin-bottom: 16px; letter-spacing: 0.3px; }
+  .header h1 { font-size: 32px; font-weight: 700; line-height: 1.3; color: #111; margin-bottom: 12px; }
+  .header p { font-size: 16px; color: #555; line-height: 1.7; max-width: 600px; }
+  .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .logo-circle { width: 44px; height: 44px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
+  .company-name { font-size: 18px; font-weight: 500; color: #1a1a1a; }
+
+  /* Pain section */
+  .section { margin-bottom: 48px; }
+  .section-label { font-size: 12px; font-weight: 500; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .pain-card { background: #fff; border-radius: 12px; padding: 20px 18px; border: 1px solid #e8e4de; }
+  .pain-num { font-size: 28px; font-weight: 700; color: #c0392b; margin-bottom: 6px; }
+  .pain-label { font-size: 13px; color: #666; line-height: 1.5; }
+
+  /* Flow */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-step { display: flex; gap: 20px; align-items: flex-start; position: relative; }
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 19px;
+    top: 44px;
+    width: 2px;
+    height: calc(100% - 10px);
+    background: #e0ddd6;
+  }
+  .step-dot { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+  .s1 { background: #dbeafe; color: #1e40af; }
+  .s2 { background: #d4f0e4; color: #0a5e3f; }
+  .s3 { background: #fef3c7; color: #92400e; }
+  .s4 { background: #ede9fe; color: #5b21b6; }
+  .s5 { background: #dcfce7; color: #166534; }
+  .step-body { flex: 1; padding-bottom: 32px; }
+  .step-title { font-size: 16px; font-weight: 700; color: #111; margin: 8px 0 6px; }
+  .step-desc { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 10px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11px; padding: 4px 12px; border-radius: 20px; background: #f0ede6; color: #555; border: 1px solid #e0ddd6; }
+
+  /* Tools */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+  .tool-card { background: #fff; border: 1px solid #e8e4de; border-radius: 12px; padding: 16px 18px; }
+  .tool-role { font-size: 11px; color: #888; margin-bottom: 5px; }
+  .tool-name { font-size: 15px; font-weight: 700; color: #111; }
+
+  /* ROI */
+  .roi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .roi-card { background: #1a1a1a; border-radius: 12px; padding: 20px; text-align: center; }
+  .roi-val { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .roi-label { font-size: 12px; color: #aaa; }
+
+  /* CTA */
+  .cta { background: #d4f0e4; border-radius: 16px; padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .cta-text { font-size: 18px; font-weight: 700; color: #0a3d28; margin-bottom: 6px; }
+  .cta-sub { font-size: 14px; color: #1a6644; }
+  .cta-btn { background: #0a3d28; color: #fff; border: none; padding: 14px 28px; border-radius: 10px; font-family: 'Heebo', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+  /* Divider */
+  .divider { height: 1px; background: #e0ddd6; margin: 0 0 48px; }
+
+  /* Footer */
+  .footer { text-align: center; font-size: 12px; color: #aaa; margin-top: 48px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="logo-area">
+    <div class="logo-circle">GG</div>
+    <span class="company-name">גפן גלובל × אוטומציה</span>
+  </div>
+
+  <div class="header">
+    <span class="badge">הצעת פתרון</span>
+    <h1>workflow מלא לניהול לקוחות –<br>בלי פינג פונג, בלי אובדן לידים</h1>
+    <p>מהפגישה הראשונה ועד סגירת עסקה – המערכת עושה את העבודה. הצוות מתמקד במה שחשוב: בניית אמון ומכירה.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PAIN -->
+  <div class="section">
+    <p class="section-label">הבעיה כיום</p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <p class="pain-num">~60%</p>
+        <p class="pain-label">מזמן הצוות הולך על תיאומים ידניים</p>
+      </div>
+      <div class="pain-card">
+        <p class="pain-num">3–7</p>
+        <p class="pain-label">הודעות פינג פונג לקבל מסמך אחד מלקוח</p>
+      </div>
+      <div class="pain-card">
+        <p class="pain-num">אפס</p>
+        <p class="pain-label">מעקב אוטומטי אחרי לקוחות שלא ענו</p>
+      </div>
+      <div class="pain-card">
+        <p class="pain-num">ידני</p>
+        <p class="pain-label">כל עדכון CRM נעשה על ידי אדם</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FLOW -->
+  <div class="section">
+    <p class="section-label">הפתרון – 5 שלבים אוטומטיים</p>
+    <div class="flow">
+
+      <div class="flow-step">
+        <div class="step-dot s1">1</div>
+        <div class="step-body">
+          <p class="step-title">ליד נכנס – תגובה מיידית</p>
+          <p class="step-desc">לקוח ממלא טופס / שולח וואטסאפ → הבוט שולח הודעת פתיחה תוך 30 שניות + מציע תור לפגישת היכרות. CRM נפתח לבד.</p>
+          <div class="tags"><span class="tag">WhatsApp Bot</span><span class="tag">Calendly / Katch</span><span class="tag">CRM אוטומטי</span></div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-dot s2">2</div>
+        <div class="step-body">
+          <p class="step-title">לאחר הפגישה – Granola עושה את העבודה</p>
+          <p class="step-desc">Granola מתעדת בשקט → המערכת מחלצת: מה הלקוח צריך להעביר, מה הצוות צריך לעשות, ותאריכי יעד. משימות נוצרות לבד.</p>
+          <div class="tags"><span class="tag">Granola</span><span class="tag">Make / Zapier</span><span class="tag">יצירת משימות אוטומטית</span></div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-dot s3">3</div>
+        <div class="step-body">
+          <p class="step-title">איסוף מסמכים – בלי לרדוף אחרי הלקוח</p>
+          <p class="step-desc">הבוט שולח ללקוח לינק להעלאת מסמכים → מזהה מה התקבל ומה חסר → תזכורת אוטומטית רק על מה שעדיין חסר.</p>
+          <div class="tags"><span class="tag">Google Drive</span><span class="tag">WhatsApp Reminders</span><span class="tag">טופס חכם</span></div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-dot s4">4</div>
+        <div class="step-body">
+          <p class="step-title">follow-up חכם לאורך כל הדרך</p>
+          <p class="step-desc">לא ענה 48 שעות → הודעה. שבוע → טקסט אחר. חודש → "האם עדיין מעוניין?" – הכל בלי שאיש נגע בזה.</p>
+          <div class="tags"><span class="tag">Sequences אוטומטיות</span><span class="tag">לוגיקה לפי שלב</span><span class="tag">WhatsApp + מייל</span></div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-dot s5">5</div>
+        <div class="step-body">
+          <p class="step-title">CRM מתעדכן לבד – תמיד מעודכן</p>
+          <p class="step-desc">כל אינטראקציה, כל מסמך, כל שיחה – נרשמים אוטומטית. הצוות רואה בדיוק איפה כל לקוח ומה הצעד הבא.</p>
+          <div class="tags"><span class="tag">Pipedrive / HubSpot</span><span class="tag">היסטוריה מלאה</span><span class="tag">דשבורד בזמן אמת</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TOOLS -->
+  <div class="section">
+    <p class="section-label">ארגז הכלים</p>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <p class="tool-role">תיעוד פגישות</p>
+        <p class="tool-name">Granola</p>
+      </div>
+      <div class="tool-card">
+        <p class="tool-role">מנוע אוטומציה</p>
+        <p class="tool-name">Make / Zapier</p>
+      </div>
+      <div class="tool-card">
+        <p class="tool-role">ניהול לקוחות</p>
+        <p class="tool-name">Pipedrive</p>
+      </div>
+      <div class="tool-card">
+        <p class="tool-role">תקשורת לקוח</p>
+        <p class="tool-name">WATI WhatsApp</p>
+      </div>
+      <div class="tool-card">
+        <p class="tool-role">מסמכים</p>
+        <p class="tool-name">Google Drive</p>
+      </div>
+      <div class="tool-card">
+        <p class="tool-role">תזמון פגישות</p>
+        <p class="tool-name">Katch / Calendly</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ROI -->
+  <div class="section">
+    <p class="section-label">מה גפן גלובל מרוויחה</p>
+    <div class="roi-grid">
+      <div class="roi-card">
+        <p class="roi-val">−80%</p>
+        <p class="roi-label">פחות תיאומים ידניים</p>
+      </div>
+      <div class="roi-card">
+        <p class="roi-val">0</p>
+        <p class="roi-label">לקוחות שנופלים בין הכיסאות</p>
+      </div>
+      <div class="roi-card">
+        <p class="roi-val">24/7</p>
+        <p class="roi-label">זמינות אוטומטית ללידים</p>
+      </div>
+      <div class="roi-card">
+        <p class="roi-val">×3</p>
+        <p class="roi-label">יותר לקוחות בפחות כוח אדם</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <div>
+      <p class="cta-text">רוצים לראות איך זה נראה אצלכם?</p>
+      <p class="cta-sub">נמפה ביחד שלב אחד ונראה אוטומציה עובדת בפועל</p>
+    </div>
+    <button class="cta-btn">בואו נדבר →</button>
+  </div>
+
+  <p class="footer">הוכן עבור גפן גלובל · 2026</p>
+</div>
+</body>
+</html>
