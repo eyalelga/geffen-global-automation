@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>גפן גלובל — פגישות היום</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --primary: #1a365d;
+            --primary-light: #2a4a7f;
+            --green: #276749;
+            --green-light: #38a169;
+            --red: #9b2335;
+            --bg: #f7f8fa;
+            --card: #ffffff;
+            --text: #1a202c;
+            --text-muted: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        /* ── סרגל עליון ── */
+        .topbar {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .topbar-logo { font-size: 1.2rem; font-weight: 700; }
+        .topbar-logo span { opacity: 0.6; font-weight: 400; font-size: 0.85rem; margin-right: 8px; }
+        .topbar-center { display: flex; align-items: center; gap: 8px; }
+        .room-label { font-size: 0.8rem; opacity: 0.7; }
+        .room-chips { display: flex; gap: 4px; }
+        .room-chip {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .room-chip.active { background: white; color: var(--primary); font-weight: 700; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .agent-name {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            cursor: pointer;
+            text-decoration: underline dotted;
+        }
+        .live-clock {
+            font-size: 1.1rem;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+
+        /* ── תוכן ראשי ── */
+        .main {
+            max-width: 680px;
+            margin: 32px auto;
+            padding: 0 16px;
+        }
+        .date-header { text-align: center; margin-bottom: 28px; }
+        .date-hebrew { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .date-sub { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* ── באנר פגישה פעילה ── */
+        .active-banner {
+            background: var(--green);
+            color: white;
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            display: none;
+            box-shadow: 0 4px 20px rgba(39,103,73,0.35);
+        }
+        .active-banner.show { display: block; }
+        .active-label {
+            font-size: 0.75rem;
+            opacity: 0.75;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .active-client { font-size: 1.7rem; font-weight: 700; margin-bottom: 4px; }
+        .active-meta { font-size: 0.85rem; opacity: 0.75; margin-bottom: 20px; }
+        .active-footer { display: flex; justify-content: space-between; align-items: center; }
+        .active-timer {
+            font-size: 2.2rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 3px;
+        }
+        .btn-end {
+            background: white;
+            color: var(--red);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .btn-end:hover { background: #fff5f5; transform: scale(1.02); }
+
+        /* ── רשימת פגישות ── */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-refresh {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .btn-refresh:hover { background: var(--border); }
+        .meeting-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s;
+        }
+        .meeting-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .meeting-card.past { opacity: 0.4; }
+        .meeting-card.is-active { border-color: var(--green-light); background: #f0fff4; }
+        .meeting-time {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-variant-numeric: tabular-nums;
+            min-width: 52px;
+        }
+        .meeting-info { flex: 1; }
+        .meeting-client { font-size: 1rem; font-weight: 600; margin-bottom: 2px; }
+        .meeting-sub { font-size: 0.8rem; color: var(--text-muted); }
+        .btn-start {
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-start:hover { background: var(--green-light); transform: scale(1.02); }
+        .btn-start:disabled { background: #a0aec0; cursor: not-allowed; transform: none; }
+        .badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-active { background: #c6f6d5; color: var(--green); }
+        .badge-done { background: #e2e8f0; color: #718096; }
+
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+        .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+        /* ── מודל הגדרות ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 420px;
+            margin: 16px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+        }
+        .modal-title { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+        .modal-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+        .form-label small { font-weight: 400; color: var(--text-muted); }
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            direction: rtl;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,54,93,0.1); }
+        .btn-save {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .btn-save:hover { background: var(--primary-light); }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d3748;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 200;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<!-- ── סרגל עליון ──────────────────────────────────────────────────────── -->
+<div class="topbar">
+    <div class="topbar-logo">
+        גפן גלובל
+        <span>ניהול פגישות</span>
+    </div>
+    <div class="topbar-center">
+        <span class="room-label">חדר:</span>
+        <div class="room-chips">
+            <div class="room-chip" data-room="1" onclick="setRoom('1')">1</div>
+            <div class="room-chip" data-room="2" onclick="setRoom('2')">2</div>
+            <div class="room-chip" data-room="3" onclick="setRoom('3')">3</div>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <span class="agent-name" id="agentDisplay" onclick="openSetup()">לחץ להגדרה</span>
+        <span class="live-clock" id="liveClock">00:00:00</span>
+    </div>
+</div>
+
+<!-- ── תוכן ראשי ──────────────────────────────────────────────────────── -->
+<div class="main">
+
+    <div class="date-header">
+        <div class="date-hebrew" id="todayDate"></div>
+        <div class="date-sub">פגישות מתואמות להיום</div>
+    </div>
+
+    <!-- באנר פגישה פעילה -->
+    <div class="active-banner" id="activeBanner">
+        <div class="active-label">● פגישה פעילה כעת</div>
+        <div class="active-client" id="activeClient">—</div>
+        <div class="active-meta" id="activeMeta"></div>
+        <div class="active-footer">
+            <div class="active-timer" id="activeTimer">00:00:00</div>
+            <button class="btn-end" onclick="endMeeting()">סיים פגישה ✓</button>
+        </div>
+    </div>
+
+    <!-- רשימת פגישות -->
+    <div class="section-header">
+        <span class="section-title">פגישות היום</span>
+        <button class="btn-refresh" onclick="fetchMeetings()">↻ רענן</button>
+    </div>
+    <div id="meetingsList">
+        <div class="empty-state"><div class="empty-icon">📅</div><div>טוען פגישות...</div></div>
+    </div>
+
+</div>
+
+<!-- ── מודל הגדרות ──────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="setupModal">
+    <div class="modal">
+        <div class="modal-title">הגדרת עמדה</div>
+        <div class="modal-sub">הגדרה חד-פעמית. מזהה את הנציג ואת החדר בכל דוח פגישה.</div>
+        <div class="form-group">
+            <label class="form-label">שם הנציג</label>
+            <input type="text" class="form-input" id="inputAgent" placeholder="לדוגמה: משה כהן">
+        </div>
+        <div class="form-group">
+            <label class="form-label">חדר ברירת מחדל</label>
+            <select class="form-input" id="inputRoom">
+                <option value="1">חדר 1</option>
+                <option value="2">חדר 2</option>
+                <option value="3">חדר 3</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Fireberry API Key <small>(אפשר להוסיף לאחר מכן)</small></label>
+            <input type="password" class="form-input" id="inputApiKey" placeholder="Bearer token">
+        </div>
+        <div class="form-group">
+            <label class="form-label">n8n Webhook URL <small>(אפשר להוסיף לאחר מכן)</small></label>
+            <input type="text" class="form-input" id="inputWebhook" placeholder="http://qnap:5678/webhook/meeting">
+        </div>
+        <button class="btn-save" onclick="saveSetup()">שמור והתחל ›</button>
+    </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════
+//  CONFIG — נשמר ב-localStorage של הדפדפן
+// ════════════════════════════════════════════════════════════════════════
+let CFG = {
+    agentName: '',
+    room: '1',
+    apiKey: '',
+    webhook: '',
+    fireberyBase: 'https://api.fireberry.com/api/v1'
+};
+
+// ════════════════════════════════════════════════════════════════════════
+//  SESSION STATE
+// ════════════════════════════════════════════════════════════════════════
+let session = null;   // { clientId, clientName, startTime, interval }
+let meetings = [];
+
+// ════════════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════════════
+function init() {
+    const saved = localStorage.getItem('gg_cfg');
+    if (saved) CFG = { ...CFG, ...JSON.parse(saved) };
+    startClock();
+    setDateHeader();
+    applyConfig();
+    if (!CFG.agentName) {
+        openSetup();
+    } else {
+        fetchMeetings();
+        restoreSession();
+    }
+}
+
+function applyConfig() {
+    document.getElementById('agentDisplay').textContent = CFG.agentName || 'לחץ להגדרה';
+    document.querySelectorAll('.room-chip').forEach(c =>
+        c.classList.toggle('active', c.dataset.room === CFG.room));
+}
+
+function setRoom(r) {
+    CFG.room = r;
+    localStorage.setItem('gg_cfg', JSON.stringify(CFG));
+    applyConfig();
+    showToast('חדר ' + r + ' נבחר');
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  SETUP MODAL
+// ════════════════════════════════════════════════════════════════════════
+function openSetup() {
+    document.getElementById('inputAgent').value = CFG.agentName;
+    document.getElementById('inputRoom').value = CFG.room;
+    document.getElementById('inputApiKey').value = CFG.apiKey;
+    document.getElementById('inputWebhook').value = CFG.webhook;
+    document.getElementById('setupModal').classList.add('show');
+}
+
+function saveSetup() {
+    const name = document.getElementById('inputAgent').value.trim();
+    if (!name) { alert('נא להזין שם נציג'); return; }
+    CFG.agentName = name;
+    CFG.room      = document.getElementById('inputRoom').value;
+    CFG.apiKey    = document.getElementById('inputApiKey').value.trim();
+    CFG.webhook   = document.getElementById('inputWebhook').value.trim();
+    localStorage.setItem('gg_cfg', JSON.stringify(CFG));
+    applyConfig();
+    document.getElementById('setupModal').classList.remove('show');
+    fetchMeetings();
+    showToast('ההגדרות נשמרו ✓');
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  FIREBERRY — שליפת פגישות היום
+// ════════════════════════════════════════════════════════════════════════
+async function fetchMeetings() {
+    renderLoading();
+    if (!CFG.apiKey) { renderDemo(); return; }
+
+    const today = new Date().toISOString().split('T')[0];
+    try {
+        const res = await fetch(
+            `${CFG.fireberyBase}/activities?date=${today}&type=meeting`,
+            { headers: { 'Authorization': `Bearer ${CFG.apiKey}`, 'Content-Type': 'application/json' } }
+        );
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        meetings = (data.records || data.items || []).map(r => ({
+            id:         r.id,
+            clientName: r.contactName || r.clientName || r.title,
+            clientId:   r.contactId   || r.clientId   || r.id,
+            time:       r.startTime   || r.time,
+            topic:      r.subject     || r.topic || ''
+        }));
+        renderMeetings();
+    } catch {
+        renderDemo();
+        showToast('Fireberry לא זמין — מוצגות פגישות לדוגמה');
+    }
+}
+
+function renderLoading() {
+    document.getElementById('meetingsList').innerHTML =
+        '<div class="empty-state"><div>טוען פגישות...</div></div>';
+}
+
+// נתוני הדגמה — יוחלפו ע"י Fireberry API
+function renderDemo() {
+    const h = new Date().getHours();
+    const p = n => String(n).padStart(2,'0');
+    meetings = [
+        { id:'d1', clientName:'כהן דוד',   clientId:'101', time:`${p(h-1)}:00`, topic:'מעקב חוזה' },
+        { id:'d2', clientName:'לוי שרה',   clientId:'102', time:`${p(h)}:30`,   topic:'פגישת היכרות' },
+        { id:'d3', clientName:'ברק משה',   clientId:'103', time:`${p(h+1)}:00`, topic:'הצגת נכס' },
+        { id:'d4', clientName:'גולן רחל',  clientId:'104', time:`${p(h+2)}:30`, topic:'חתימת הסכם' },
+    ];
+    renderMeetings();
+}
+
+function renderMeetings() {
+    const nowMins = toMins(timeStr(new Date()));
+    const html = meetings.map(m => {
+        const mMins   = toMins(m.time);
+        const isPast  = mMins < nowMins - 90;
+        const isNow   = session && session.clientId === m.id;
+
+        let action;
+        if (isNow) {
+            action = `<span class="badge badge-active">פעיל ●</span>`;
+        } else if (isPast) {
+            action = `<span class="badge badge-done">הסתיים</span>`;
+        } else {
+            const dis = session ? 'disabled' : '';
+            action = `<button class="btn-start" ${dis}
+                        onclick="startMeeting('${m.id}','${esc(m.clientName)}','${m.time}')">
+                        התחל ›
+                      </button>`;
+        }
+        return `
+        <div class="meeting-card ${isPast?'past':''} ${isNow?'is-active':''}">
+            <div class="meeting-time">${m.time}</div>
+            <div class="meeting-info">
+                <div class="meeting-client">${esc(m.clientName)}</div>
+                <div class="meeting-sub">${esc(m.topic)}</div>
+            </div>
+            ${action}
+        </div>`;
+    }).join('');
+
+    document.getElementById('meetingsList').innerHTML = html ||
+        '<div class="empty-state"><div class="empty-icon">✅</div><div>אין פגישות נוספות להיום</div></div>';
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  SESSION — התחלה
+// ════════════════════════════════════════════════════════════════════════
+async function startMeeting(clientId, clientName, scheduledTime) {
+    const startTime = new Date();
+    session = { clientId, clientName, startTime, scheduledTime };
+    localStorage.setItem('gg_session', JSON.stringify({
+        clientId, clientName, scheduledTime, startTime: startTime.toISOString()
+    }));
+
+    document.getElementById('activeClient').textContent = clientName;
+    document.getElementById('activeMeta').textContent =
+        `חדר ${CFG.room}  ·  התחילה בשעה ${timeStr(startTime)}  ·  נציג: ${CFG.agentName}`;
+    document.getElementById('activeBanner').classList.add('show');
+    session.interval = setInterval(tickTimer, 1000);
+    tickTimer();
+    renderMeetings();
+
+    await sendWebhook('meeting_start', {
+        clientId, clientName, scheduledTime,
+        room: CFG.room,
+        agent: CFG.agentName,
+        startTime: startTime.toISOString()
+    });
+    showToast(`הפגישה עם ${clientName} התחילה`);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  SESSION — סיום
+// ════════════════════════════════════════════════════════════════════════
+async function endMeeting() {
+    if (!session) return;
+    const endTime = new Date();
+    const mins = Math.round((endTime - session.startTime) / 60000);
+    clearInterval(session.interval);
+    const ended = { ...session };
+    session = null;
+    localStorage.removeItem('gg_session');
+    document.getElementById('activeBanner').classList.remove('show');
+    renderMeetings();
+
+    await sendWebhook('meeting_end', {
+        clientId:        ended.clientId,
+        clientName:      ended.clientName,
+        room:            CFG.room,
+        agent:           CFG.agentName,
+        startTime:       ended.startTime.toISOString(),
+        endTime:         endTime.toISOString(),
+        durationMinutes: mins
+    });
+    showToast(`הפגישה הסתיימה (${mins} דק׳) — הסיכום בדרך לתיק הלקוח`);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  WEBHOOK → n8n
+// ════════════════════════════════════════════════════════════════════════
+async function sendWebhook(event, payload) {
+    if (!CFG.webhook) return;
+    try {
+        await fetch(CFG.webhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event, ...payload })
+        });
+    } catch (e) { console.warn('webhook error', e); }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════════════
+function restoreSession() {
+    const s = localStorage.getItem('gg_session');
+    if (!s) return;
+    const d = JSON.parse(s);
+    session = { ...d, startTime: new Date(d.startTime) };
+    document.getElementById('activeClient').textContent = session.clientName;
+    document.getElementById('activeMeta').textContent =
+        `חדר ${CFG.room}  ·  התחילה בשעה ${timeStr(session.startTime)}  ·  נציג: ${CFG.agentName}`;
+    document.getElementById('activeBanner').classList.add('show');
+    session.interval = setInterval(tickTimer, 1000);
+    tickTimer();
+}
+
+function tickTimer() {
+    if (!session) return;
+    document.getElementById('activeTimer').textContent = hms(Date.now() - session.startTime);
+}
+
+function startClock() {
+    setInterval(() => {
+        document.getElementById('liveClock').textContent = timeStr(new Date());
+    }, 1000);
+    document.getElementById('liveClock').textContent = timeStr(new Date());
+}
+
+function setDateHeader() {
+    const d = new Date();
+    const days   = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+    const months = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני',
+                    'יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+    document.getElementById('todayDate').textContent =
+        `יום ${days[d.getDay()]}, ${d.getDate()} ב${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function timeStr(d) {
+    return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+function toMins(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function hms(ms) {
+    const s = Math.floor(ms/1000);
+    return `${p(Math.floor(s/3600))}:${p(Math.floor((s%3600)/60))}:${p(s%60)}`;
+}
+function p(n) { return String(n).padStart(2,'0'); }
+function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── הפעל ──
+init();
+</script>
+</body>
+</html>

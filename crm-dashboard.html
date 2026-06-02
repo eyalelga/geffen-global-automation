@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>גפן גלובל — מערכת ניהול לידים</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; direction: rtl; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .logo { display: flex; align-items: center; gap: 14px; }
+  .logo-icon {
+    width: 44px; height: 44px; background: linear-gradient(135deg, #c9a84c, #e8d48b);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: bold; color: #1a1a2e;
+  }
+  .logo-text h1 { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+  .logo-text span { color: #c9a84c; font-size: 12px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .bot-status {
+    background: rgba(46, 213, 115, 0.15);
+    border: 1px solid #2ed573;
+    border-radius: 20px;
+    padding: 6px 14px;
+    display: flex; align-items: center; gap: 8px;
+    color: #2ed573; font-size: 13px;
+  }
+  .bot-dot { width: 8px; height: 8px; background: #2ed573; border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .date-display { color: #8892a4; font-size: 13px; }
+
+  /* KPI Cards */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding: 28px 32px 0;
+  }
+  .kpi-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border-top: 4px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .kpi-card.blue { border-top-color: #4361ee; }
+  .kpi-card.gold { border-top-color: #c9a84c; }
+  .kpi-card.green { border-top-color: #2ed573; }
+  .kpi-card.red { border-top-color: #ff4757; }
+  .kpi-label { font-size: 12px; color: #8892a4; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .kpi-value { font-size: 32px; font-weight: 800; color: #1a1a2e; line-height: 1; }
+  .kpi-sub { font-size: 12px; color: #2ed573; margin-top: 6px; font-weight: 600; }
+  .kpi-sub.down { color: #ff4757; }
+  .kpi-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 36px; opacity: 0.08; }
+
+  /* Main Content */
+  .main { display: grid; grid-template-columns: 1fr 320px; gap: 18px; padding: 24px 32px 32px; }
+
+  /* Table Section */
+  .table-section {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+  .section-sub { font-size: 12px; color: #8892a4; margin-top: 2px; }
+  .filter-tabs { display: flex; gap: 6px; }
+  .tab {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+    border: 1px solid #e8eaf0; background: #fff; color: #8892a4; transition: all 0.2s;
+  }
+  .tab.active { background: #4361ee; color: #fff; border-color: #4361ee; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: #f8f9fc;
+    padding: 12px 18px;
+    text-align: right;
+    font-size: 11px;
+    color: #8892a4;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f0f2f5;
+  }
+  td { padding: 14px 18px; border-bottom: 1px solid #f7f8fa; font-size: 13px; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8f9fc; }
+
+  .lead-name { font-weight: 600; color: #1a1a2e; }
+  .lead-phone { color: #8892a4; font-size: 12px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700;
+  }
+  .badge.new { background: #e8f4fd; color: #4361ee; }
+  .badge.contacted { background: #fff3cd; color: #c9a84c; }
+  .badge.meeting { background: #e8fdf0; color: #2ed573; }
+  .badge.signed { background: #1a1a2e; color: #c9a84c; }
+  .badge.lost { background: #fdecea; color: #ff4757; }
+
+  .source-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 8px; font-size: 11px;
+    background: #f0f2f5; color: #555;
+  }
+
+  .bot-icon { font-size: 14px; }
+  .action-btn {
+    padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 11px; font-weight: 600;
+    background: #f0f2f5; color: #4361ee; transition: all 0.2s;
+  }
+  .action-btn:hover { background: #4361ee; color: #fff; }
+
+  /* Side Panel */
+  .side-panel { display: flex; flex-direction: column; gap: 18px; }
+
+  .panel-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .panel-title { font-size: 14px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+  /* Bot Activity */
+  .bot-activity { display: flex; flex-direction: column; gap: 10px; }
+  .activity-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px; border-radius: 10px; background: #f8f9fc;
+  }
+  .activity-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .activity-avatar.bot { background: linear-gradient(135deg, #4361ee, #7b8cde); }
+  .activity-avatar.user { background: #f0f2f5; }
+  .activity-text { font-size: 12px; color: #555; line-height: 1.5; }
+  .activity-time { font-size: 10px; color: #aaa; margin-top: 2px; }
+
+  /* Pipeline */
+  .pipeline { display: flex; flex-direction: column; gap: 8px; }
+  .pipeline-item { display: flex; align-items: center; justify-content: space-between; }
+  .pipeline-label { font-size: 12px; color: #555; }
+  .pipeline-bar-wrap { flex: 1; margin: 0 10px; height: 6px; background: #f0f2f5; border-radius: 3px; overflow: hidden; }
+  .pipeline-bar { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .pipeline-count { font-size: 12px; font-weight: 700; color: #1a1a2e; min-width: 20px; text-align: left; }
+
+  /* Automation Suggestions */
+  .suggestion-list { display: flex; flex-direction: column; gap: 10px; }
+  .suggestion {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 12px; border-radius: 10px;
+    border: 1px solid #e8eaf0;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .suggestion:hover { border-color: #4361ee; background: #f8f9ff; }
+  .suggestion-icon { font-size: 20px; }
+  .suggestion-text strong { font-size: 12px; color: #1a1a2e; display: block; }
+  .suggestion-text span { font-size: 11px; color: #8892a4; }
+  .suggestion-roi { font-size: 10px; font-weight: 700; color: #2ed573; margin-top: 3px; display: block; }
+
+  /* Bottom bar */
+  .footer-bar {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    padding: 12px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-bar span { color: #8892a4; font-size: 12px; }
+  .powered { color: #c9a84c; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">G</div>
+    <div class="logo-text">
+      <h1>גפן גלובל</h1>
+      <span>מערכת ניהול לידים ואוטומציות</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="bot-status">
+      <div class="bot-dot"></div>
+      בוט ווטסאפ פעיל
+    </div>
+    <div class="date-display">מאי 2026</div>
+  </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="kpi-row">
+  <div class="kpi-card blue">
+    <div class="kpi-label">סה"כ לידים החודש</div>
+    <div class="kpi-value">47</div>
+    <div class="kpi-sub">↑ +18% לעומת חודש שעבר</div>
+    <div class="kpi-icon">📋</div>
+  </div>
+  <div class="kpi-card gold">
+    <div class="kpi-label">פגישות נקבעו</div>
+    <div class="kpi-value">23</div>
+    <div class="kpi-sub">↑ 12 על ידי הבוט</div>
+    <div class="kpi-icon">📅</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">עסקאות נחתמו</div>
+    <div class="kpi-value">8</div>
+    <div class="kpi-sub">↑ שווי €1.6M</div>
+    <div class="kpi-icon">✅</div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-label">זמן תגובה ממוצע</div>
+    <div class="kpi-value">2 דק'</div>
+    <div class="kpi-sub" style="color:#c9a84c">↓ היה 4 שעות לפני הבוט</div>
+    <div class="kpi-icon">⚡</div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+
+  <!-- Leads Table -->
+  <div class="table-section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">לידים פעילים</div>
+        <div class="section-sub">47 לידים · 12 ממתינים לטיפול</div>
+      </div>
+      <div class="filter-tabs">
+        <div class="tab active" onclick="filterLeads(this, 'all')">הכל</div>
+        <div class="tab" onclick="filterLeads(this, 'new')">חדשים</div>
+        <div class="tab" onclick="filterLeads(this, 'meeting')">פגישה</div>
+        <div class="tab" onclick="filterLeads(this, 'signed')">נחתמו</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>לקוח</th>
+          <th>מקור</th>
+          <th>פרויקט מעניין</th>
+          <th>תקציב</th>
+          <th>סטטוס</th>
+          <th>טיפל</th>
+          <th>פעולה</th>
+        </tr>
+      </thead>
+      <tbody id="leads-table">
+        <tr data-status="meeting">
+          <td><div class="lead-name">דני לוי</div><div class="lead-phone">050-1234567</div></td>
+          <td><span class="source-badge">🤖 ווטסאפ</span></td>
+          <td>Nea Iraklia Villas</td>
+          <td>€150K</td>
+          <td><span class="badge meeting">📅 פגישה נקבעה</span></td>
+          <td><span class="bot-icon">🤖</span> בוט</td>
+          <td><button class="action-btn">פרטים</button></td>
+        </tr>
+        <tr data-status="new">
+          <td><div class="lead-name">רחל כהן</div><div class="lead-phone">052-9876543</div></td>
+          <td><span class="source-badge">📱 גוגל</span></td>
+          <td>Halkidiki The Pearl</td>
+          <td>€200K</td>
+          <td><span class="badge new">🆕 חדש</span></td>
+          <td><span class="bot-icon">🤖</span> בוט</td>
+          <td><button class="action-btn">טיפול</button></td>
+        </tr>
+        <tr data-status="signed">
+          <td><div class="lead-name">יוסי אברהם</div><div class="lead-phone">054-1122334</div></td>
+          <td><span class="source-badge">👥 הפניה</span></td>
+          <td>Neoi Epivates Sea Front</td>
+          <td>€250K</td>
+          <td><span class="badge signed">✅ נחתם</span></td>
+          <td>✋ ידני</td>
+          <td><button class="action-btn">חוזה</button></td>
+        </tr>
+        <tr data-status="contacted">
+          <td><div class="lead-name">מיכל שמש</div><div class="lead-phone">053-5544332</div></td>
+          <td><span class="source-badge">📱 גוגל</span></td>
+          <td>Nea Iraklia Villas</td>
+          <td>€120K</td>
+          <td><span class="badge contacted">📞 בטיפול</span></td>
+          <td><span class="bot-icon">🤖</span> בוט</td>
+          <td><button class="action-btn">פרטים</button></td>
+        </tr>
+        <tr data-status="new">
+          <td><div class="lead-name">אלון פרץ</div><div class="lead-phone">058-7788990</div></td>
+          <td><span class="source-badge">📱 גוגל</span></td>
+          <td>Halkidiki The Pearl</td>
+          <td>€300K</td>
+          <td><span class="badge new">🆕 חדש</span></td>
+          <td><span class="bot-icon">🤖</span> בוט</td>
+          <td><button class="action-btn">טיפול</button></td>
+        </tr>
+        <tr data-status="meeting">
+          <td><div class="lead-name">שרה גולדברג</div><div class="lead-phone">050-3344556</div></td>
+          <td><span class="source-badge">👥 הפניה</span></td>
+          <td>Neoi Epivates Sea Front</td>
+          <td>€180K</td>
+          <td><span class="badge meeting">📅 פגישה נקבעה</span></td>
+          <td><span class="bot-icon">🤖</span> בוט</td>
+          <td><button class="action-btn">פרטים</button></td>
+        </tr>
+        <tr data-status="lost">
+          <td><div class="lead-name">בני שפירא</div><div class="lead-phone">052-6677889</div></td>
+          <td><span class="source-badge">📱 גוגל</span></td>
+          <td>Halkidiki The Pearl</td>
+          <td>€90K</td>
+          <td><span class="badge lost">❌ נסגר</span></td>
+          <td>✋ ידני</td>
+          <td><button class="action-btn">פרטים</button></td>
+        </tr>
+        <tr data-status="signed">
+          <td><div class="lead-name">נועה ביטון</div><div class="lead-phone">054-9900112</div></td>
+          <td><span class="source-badge">🤖 ווטסאפ</span></td>
+          <td>Nea Iraklia Villas</td>
+          <td>€220K</td>
+          <td><span class="badge signed">✅ נחתם</span></td>
+          <td><span class="bot-icon">🤖</span> בוט</td>
+          <td><button class="action-btn">חוזה</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Side Panel -->
+  <div class="side-panel">
+
+    <!-- Bot Activity -->
+    <div class="panel-card">
+      <div class="panel-title">🤖 פעילות בוט — היום</div>
+      <div class="bot-activity">
+        <div class="activity-item">
+          <div class="activity-avatar bot">🤖</div>
+          <div>
+            <div class="activity-text">בוט ענה לרחל כהן תוך <strong>43 שניות</strong> — שאל על תקציב ופרויקט מועדף</div>
+            <div class="activity-time">לפני 12 דקות</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar bot">📅</div>
+          <div>
+            <div class="activity-text">פגישה נקבעה עם דני לוי ל-<strong>יום ד' 14:00</strong> — אוטומטית</div>
+            <div class="activity-time">לפני 1 שעה</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar bot">📊</div>
+          <div>
+            <div class="activity-text">דוח חודשי נשלח ל-<strong>8 משקיעים</strong> — אוטומטית</div>
+            <div class="activity-time">הבוקר 08:00</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-avatar bot">🤖</div>
+          <div>
+            <div class="activity-text">אלון פרץ פנה בווטסאפ — בוט סינן וזיהה <strong>ליד איכותי</strong></div>
+            <div class="activity-time">לפני 3 שעות</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="panel-card">
+      <div class="panel-title">📊 פייפליין</div>
+      <div class="pipeline">
+        <div class="pipeline-item">
+          <div class="pipeline-label">חדשים</div>
+          <div class="pipeline-bar-wrap"><div class="pipeline-bar" style="width:60%;background:#4361ee"></div></div>
+          <div class="pipeline-count">12</div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-label">בטיפול</div>
+          <div class="pipeline-bar-wrap"><div class="pipeline-bar" style="width:45%;background:#c9a84c"></div></div>
+          <div class="pipeline-count">9</div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-label">פגישה</div>
+          <div class="pipeline-bar-wrap"><div class="pipeline-bar" style="width:35%;background:#7b8cde"></div></div>
+          <div class="pipeline-count">7</div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-label">נחתמו</div>
+          <div class="pipeline-bar-wrap"><div class="pipeline-bar" style="width:20%;background:#2ed573"></div></div>
+          <div class="pipeline-count">8</div>
+        </div>
+        <div class="pipeline-item">
+          <div class="pipeline-label">נסגרו</div>
+          <div class="pipeline-bar-wrap"><div class="pipeline-bar" style="width:15%;background:#ff4757"></div></div>
+          <div class="pipeline-count">11</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Automation Suggestions -->
+    <div class="panel-card">
+      <div class="panel-title">⚡ אוטומציות מומלצות</div>
+      <div class="suggestion-list">
+        <div class="suggestion">
+          <div class="suggestion-icon">🤖</div>
+          <div class="suggestion-text">
+            <strong>בוט ווטסאפ לסינון לידים</strong>
+            <span>עונה 24/7, שואל 5 שאלות מיון</span>
+            <span class="suggestion-roi">↑ חוסך 3 שעות/יום</span>
+          </div>
+        </div>
+        <div class="suggestion">
+          <div class="suggestion-icon">📊</div>
+          <div class="suggestion-text">
+            <strong>דוחות אוטומטיים למשקיעים</strong>
+            <span>PDF חודשי — תשואה, שכירות, עלויות</span>
+            <span class="suggestion-roi">↑ 100% אוטומטי</span>
+          </div>
+        </div>
+        <div class="suggestion">
+          <div class="suggestion-icon">📅</div>
+          <div class="suggestion-text">
+            <strong>קביעת פגישות אוטומטית</strong>
+            <span>מסנכרן עם יומן ושולח אישור</span>
+            <span class="suggestion-roi">↑ ללא מגע יד אדם</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer-bar">
+  <span>גפן גלובל © 2026 — מערכת ניהול לידים</span>
+  <span class="powered">⚡ Powered by AI Automations</span>
+</div>
+
+<script>
+function filterLeads(el, status) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const rows = document.querySelectorAll('#leads-table tr');
+  rows.forEach(row => {
+    if (status === 'all' || row.dataset.status === status) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+</script>
+</body>
+</html>

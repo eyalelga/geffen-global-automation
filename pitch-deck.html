@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>גפן גלובל — הצעת אוטומציות ובינה מלאכותית</title>
+<style>
+:root {
+  --navy:    #0d1f35;
+  --navy2:   #162d4a;
+  --teal:    #00a8cc;
+  --teal2:   #0089a8;
+  --gold:    #c9943a;
+  --gold2:   #e8b55a;
+  --white:   #ffffff;
+  --offwhite:#f7f9fc;
+  --gray:    #6b7a8d;
+  --light:   #e8edf3;
+  --text:    #1a2535;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: var(--text);
+  direction: rtl;
+  background: var(--white);
+}
+
+/* ─── NAVBAR ─── */
+nav {
+  position: fixed; top:0; right:0; left:0; z-index:100;
+  background: var(--navy);
+  padding: 0 48px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+}
+.nav-logo { display:flex; align-items:center; gap:12px; }
+.nav-logo-mark {
+  width:36px; height:36px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:18px; color:var(--navy);
+}
+.nav-logo-text { color:var(--white); font-size:16px; font-weight:700; }
+.nav-logo-text span { color:var(--gold2); }
+.nav-links { display:flex; gap:32px; }
+.nav-links a {
+  color: rgba(255,255,255,0.7);
+  text-decoration:none; font-size:14px;
+  transition: color .2s;
+}
+.nav-links a:hover { color:var(--gold2); }
+.nav-cta {
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color:var(--white); border:none; padding:9px 22px;
+  border-radius:8px; font-size:13px; font-weight:700;
+  cursor:pointer; transition: opacity .2s;
+}
+.nav-cta:hover { opacity:.85; }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 55%, #0a3d5e 100%);
+  display: flex; align-items: center;
+  padding: 100px 80px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content:'';
+  position:absolute; top:-120px; left:-120px;
+  width:500px; height:500px;
+  background: radial-gradient(circle, rgba(0,168,204,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero::after {
+  content:'';
+  position:absolute; bottom:-80px; right:10%;
+  width:400px; height:400px;
+  background: radial-gradient(circle, rgba(201,148,58,0.1) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-content { max-width: 620px; position:relative; z-index:1; }
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background: rgba(0,168,204,0.15);
+  border: 1px solid rgba(0,168,204,0.35);
+  border-radius:20px; padding:6px 16px;
+  color: var(--teal); font-size:13px; font-weight:600;
+  margin-bottom:28px;
+}
+.hero-badge-dot { width:7px; height:7px; background:var(--teal); border-radius:50%; animation:pulse 1.8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+.hero h1 {
+  font-size: 48px; font-weight:900; color:var(--white);
+  line-height: 1.15; margin-bottom:24px;
+  letter-spacing:-0.5px;
+}
+.hero h1 em { color:var(--gold2); font-style:normal; }
+.hero p {
+  font-size:17px; color:rgba(255,255,255,0.72);
+  line-height:1.75; margin-bottom:40px; max-width:520px;
+}
+.hero-btns { display:flex; gap:14px; flex-wrap:wrap; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color:var(--white); border:none;
+  padding:14px 32px; border-radius:10px;
+  font-size:15px; font-weight:700; cursor:pointer;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 4px 20px rgba(0,168,204,0.4);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,168,204,0.45); }
+.btn-secondary {
+  background: rgba(255,255,255,0.08);
+  color:var(--white); border: 1px solid rgba(255,255,255,0.25);
+  padding:14px 32px; border-radius:10px;
+  font-size:15px; font-weight:600; cursor:pointer;
+  transition: background .2s;
+}
+.btn-secondary:hover { background:rgba(255,255,255,0.14); }
+
+.hero-stats {
+  display:flex; gap:40px; margin-top:56px;
+  padding-top:32px; border-top:1px solid rgba(255,255,255,0.1);
+}
+.stat-item {}
+.stat-num { font-size:32px; font-weight:900; color:var(--gold2); }
+.stat-label { font-size:13px; color:rgba(255,255,255,0.55); margin-top:3px; }
+
+/* ─── SECTION BASE ─── */
+.section { padding: 88px 80px; }
+.section-alt { background: var(--offwhite); }
+.section-tag {
+  display:inline-block;
+  background: rgba(0,168,204,0.1);
+  color:var(--teal2); font-size:12px; font-weight:700;
+  padding:5px 14px; border-radius:12px; letter-spacing:.5px;
+  margin-bottom:14px; text-transform:uppercase;
+}
+.section-title { font-size:36px; font-weight:900; color:var(--navy); line-height:1.2; margin-bottom:14px; }
+.section-sub { font-size:16px; color:var(--gray); line-height:1.7; max-width:580px; }
+
+/* ─── PROBLEM/SOLUTION ─── */
+.compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:52px; }
+.compare-card {
+  border-radius:16px; padding:36px;
+  position:relative; overflow:hidden;
+}
+.compare-card.before {
+  background:#fff;
+  border: 2px solid #e8edf3;
+}
+.compare-card.after {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+}
+.compare-card-tag {
+  display:inline-block; font-size:11px; font-weight:800;
+  padding:4px 12px; border-radius:10px; margin-bottom:20px;
+  text-transform:uppercase; letter-spacing:.8px;
+}
+.before .compare-card-tag { background:#fdecea; color:#e53935; }
+.after .compare-card-tag { background:rgba(0,168,204,0.2); color:var(--teal); }
+.compare-card h3 { font-size:20px; font-weight:800; margin-bottom:20px; }
+.before h3 { color:var(--navy); }
+.after h3 { color:var(--white); }
+.compare-list { list-style:none; display:flex; flex-direction:column; gap:12px; }
+.compare-list li {
+  display:flex; align-items:center; gap:12px;
+  font-size:14px; line-height:1.5;
+}
+.before .compare-list li { color:#555; }
+.after .compare-list li { color:rgba(255,255,255,0.85); }
+.compare-list li::before { flex-shrink:0; font-size:16px; }
+.before .compare-list li::before { content:'✗'; color:#e53935; font-weight:900; }
+.after .compare-list li::before { content:'✓'; color:var(--teal); font-weight:900; }
+.compare-arrow {
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px; color:var(--teal);
+}
+
+/* ─── FEATURES ─── */
+.features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:52px; }
+.feature-card {
+  background:var(--white);
+  border-radius:16px; padding:32px 28px;
+  border: 1px solid var(--light);
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+  cursor:default;
+}
+.feature-card:hover {
+  transform:translateY(-5px);
+  box-shadow: 0 12px 40px rgba(13,31,53,0.1);
+  border-color: var(--teal);
+}
+.feature-icon {
+  width:52px; height:52px;
+  background: linear-gradient(135deg, rgba(0,168,204,0.1), rgba(0,168,204,0.18));
+  border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; margin-bottom:20px;
+}
+.feature-card h3 { font-size:17px; font-weight:800; color:var(--navy); margin-bottom:10px; }
+.feature-card p { font-size:13px; color:var(--gray); line-height:1.7; }
+.feature-roi {
+  display:inline-block; margin-top:14px;
+  font-size:12px; font-weight:700; color:var(--teal2);
+  background: rgba(0,168,204,0.08); padding:4px 10px; border-radius:8px;
+}
+
+/* ─── MOCK CRM ─── */
+.crm-wrapper {
+  background: var(--navy);
+  border-radius:20px; padding:28px;
+  margin-top:52px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.crm-bar {
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:22px;
+}
+.crm-dot { width:12px; height:12px; border-radius:50%; }
+.crm-bar-title {
+  margin-right:auto; color:rgba(255,255,255,0.5);
+  font-size:13px;
+}
+.crm-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+.crm-kpi {
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px; padding:18px 20px;
+}
+.crm-kpi-label { font-size:11px; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+.crm-kpi-val { font-size:28px; font-weight:900; color:var(--white); }
+.crm-kpi-change { font-size:11px; color:var(--teal); margin-top:4px; }
+.crm-kpi-change.gold { color:var(--gold2); }
+
+.crm-table-wrap { background:rgba(255,255,255,0.04); border-radius:12px; overflow:hidden; }
+.crm-table { width:100%; border-collapse:collapse; }
+.crm-table th {
+  background:rgba(255,255,255,0.05);
+  padding:11px 16px; text-align:right;
+  font-size:11px; color:rgba(255,255,255,0.4);
+  text-transform:uppercase; letter-spacing:.5px;
+}
+.crm-table td {
+  padding:13px 16px; border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:13px; color:rgba(255,255,255,0.8);
+}
+.crm-table tr:last-child td { border-bottom:none; }
+.crm-table tr:hover td { background:rgba(255,255,255,0.03); }
+.crm-name { font-weight:700; color:var(--white) !important; }
+.crm-badge {
+  display:inline-block; padding:3px 10px; border-radius:10px;
+  font-size:11px; font-weight:700;
+}
+.crm-badge.new { background:rgba(0,168,204,0.2); color:var(--teal); }
+.crm-badge.meet { background:rgba(201,148,58,0.2); color:var(--gold2); }
+.crm-badge.signed { background:rgba(46,213,115,0.2); color:#2ed573; }
+.crm-badge.hot { background:rgba(255,71,87,0.2); color:#ff4757; }
+.bot-tag { font-size:11px; color:var(--teal); }
+
+/* ─── ROI ─── */
+.roi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:52px; }
+.roi-card {
+  background:var(--white);
+  border-radius:16px; padding:36px 32px;
+  text-align:center;
+  border: 2px solid var(--light);
+  transition: border-color .2s;
+}
+.roi-card:hover { border-color:var(--teal); }
+.roi-card.highlight {
+  background: linear-gradient(160deg, var(--navy), var(--navy2));
+  border-color: var(--teal);
+}
+.roi-icon { font-size:36px; margin-bottom:16px; }
+.roi-num { font-size:42px; font-weight:900; color:var(--teal); margin-bottom:8px; }
+.roi-card.highlight .roi-num { color:var(--gold2); }
+.roi-label { font-size:15px; font-weight:700; color:var(--navy); margin-bottom:8px; }
+.roi-card.highlight .roi-label { color:var(--white); }
+.roi-desc { font-size:13px; color:var(--gray); line-height:1.6; }
+.roi-card.highlight .roi-desc { color:rgba(255,255,255,0.6); }
+
+/* ─── PLAN ─── */
+.plan-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:52px; }
+.plan-card {
+  border-radius:16px; padding:40px 36px;
+  border: 2px solid var(--light);
+  background:var(--white);
+}
+.plan-card.featured {
+  background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%);
+  border-color:var(--teal);
+  position:relative;
+}
+.plan-featured-tag {
+  position:absolute; top:-14px; right:32px;
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color:var(--white); font-size:12px; font-weight:700;
+  padding:6px 18px; border-radius:12px;
+}
+.plan-name { font-size:14px; font-weight:800; color:var(--gray); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+.plan-card.featured .plan-name { color:rgba(255,255,255,0.5); }
+.plan-price { font-size:40px; font-weight:900; color:var(--navy); margin-bottom:4px; }
+.plan-card.featured .plan-price { color:var(--gold2); }
+.plan-period { font-size:13px; color:var(--gray); margin-bottom:28px; }
+.plan-card.featured .plan-period { color:rgba(255,255,255,0.5); }
+.plan-list { list-style:none; display:flex; flex-direction:column; gap:14px; margin-bottom:36px; }
+.plan-list li {
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:14px; color:var(--text);
+}
+.plan-card.featured .plan-list li { color:rgba(255,255,255,0.85); }
+.plan-list li span { width:20px; height:20px; background:rgba(0,168,204,0.12); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; margin-top:1px; color:var(--teal); font-weight:900; }
+.plan-btn {
+  width:100%; padding:14px;
+  border-radius:10px; border:none;
+  font-size:15px; font-weight:700; cursor:pointer;
+  transition: opacity .2s, transform .2s;
+}
+.plan-btn:hover { opacity:.85; transform:translateY(-1px); }
+.plan-btn.outline { background:transparent; border:2px solid var(--light); color:var(--navy); }
+.plan-btn.filled { background:linear-gradient(135deg, var(--teal), var(--teal2)); color:var(--white); }
+
+/* ─── FOOTER ─── */
+footer {
+  background:var(--navy);
+  padding:32px 80px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+footer span { color:rgba(255,255,255,0.4); font-size:13px; }
+footer .footer-brand { color:var(--gold2); font-size:13px; font-weight:700; }
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .compare-grid,.features-grid,.roi-grid,.plan-grid { grid-template-columns:1fr; }
+  .crm-kpis { grid-template-columns:1fr 1fr; }
+  .hero { padding:90px 24px 50px; }
+  .section { padding:60px 24px; }
+  nav { padding:0 20px; }
+  .nav-links { display:none; }
+  footer { padding:24px; flex-direction:column; gap:8px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark">G</div>
+    <div class="nav-logo-text">גפן <span>גלובל</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="#problem">האתגר</a>
+    <a href="#features">הפתרון</a>
+    <a href="#demo">דמו</a>
+    <a href="#roi">ROI</a>
+    <a href="#plan">תוכנית</a>
+  </div>
+  <button class="nav-cta">נתחיל עכשיו</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      AI Automations לגפן גלובל
+    </div>
+    <h1>כל ליד מגוגל —<br><em>מענה תוך 30 שניות.</em><br>ללא מגע יד אדם.</h1>
+    <p>
+      מערכת אוטומציות ובינה מלאכותית שמנהלת את הלידים, קובעת פגישות, שולחת דוחות למשקיעים — ומשחררת אתכם למכור.
+    </p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">צפה בדמו חי</button>
+      <button class="btn-secondary" onclick="document.getElementById('plan').scrollIntoView({behavior:'smooth'})">תוכניות ומחירים</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">×4</div>
+        <div class="stat-label">יותר לידים מטופלים</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">30″</div>
+        <div class="stat-label">זמן מענה ממוצע</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">זמינות מלאה</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">0</div>
+        <div class="stat-label">כוח אדם נוסף</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM vs SOLUTION -->
+<section class="section" id="problem">
+  <div class="section-tag">האתגר</div>
+  <div class="section-title">היום מול מחר</div>
+  <div class="section-sub">כל ליד שלא מקבל מענה מיידי — הולך לחברה אחרת. כך נראית המציאות לפני ואחרי.</div>
+  <div class="compare-grid">
+    <div class="compare-card before">
+      <div class="compare-card-tag">לפני — עכשיו</div>
+      <h3>ניהול ידני</h3>
+      <ul class="compare-list">
+        <li>ליד נכנס — מחכה שעות לתגובה</li>
+        <li>פגישות נקבעות ידנית בטלפון</li>
+        <li>דוחות למשקיעים נכתבים ידנית</li>
+        <li>לידים איכותיים הולכים לאיבוד</li>
+        <li>אין מעקב שיטתי אחרי פייפליין</li>
+        <li>עומס על הצוות בשעות שיא</li>
+      </ul>
+    </div>
+    <div class="compare-card after">
+      <div class="compare-card-tag">אחרי — עם המערכת</div>
+      <h3>אוטומציה מלאה</h3>
+      <ul class="compare-list">
+        <li>ליד נכנס — בוט עונה תוך 30 שניות</li>
+        <li>פגישות נקבעות אוטומטית + אישור</li>
+        <li>דוחות PDF נשלחים אוטומטית בחודש</li>
+        <li>ניקוד לידים — רק רציניים עוברים</li>
+        <li>דשבורד חי — כל הפייפליין במסך</li>
+        <li>הצוות מתמקד רק בסגירת עסקאות</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section section-alt" id="features">
+  <div class="section-tag">הפתרון</div>
+  <div class="section-title">מה המערכת עושה</div>
+  <div class="section-sub">6 מודולי אוטומציה שעובדים יחד — מהרגע שליד נכנס ועד שחוזה נחתם.</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>בוט ווטסאפ חכם</h3>
+      <p>עונה לכל ליד תוך שניות, שואל 5 שאלות מיון, מזהה רמת רצינות ומקבע פגישה אוטומטית.</p>
+      <span class="feature-roi">↑ חוסך 3-4 שעות ביום</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <h3>קביעת פגישות אוטומטית</h3>
+      <p>מסנכרן עם יומן Google/Outlook, בודק זמינות, שולח הזמנה + תזכורת — ללא מגע יד אדם.</p>
+      <span class="feature-roi">↑ 0 טלפונים לתיאום</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>דוחות אוטומטיים למשקיעים</h3>
+      <p>כל משקיע מקבל דוח PDF חודשי עם תשואה, שכירות ועלויות — נוצר ונשלח אוטומטית.</p>
+      <span class="feature-roi">↑ מגביר אמון ושימור לקוחות</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>ניקוד ותעדוף לידים</h3>
+      <p>AI מנתח כל ליד לפי תקציב, ציר זמן ורמת מחויבות — ומציף לצוות רק את החמים.</p>
+      <span class="feature-roi">↑ שיחות עם לקוחות רציניים בלבד</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📋</div>
+      <h3>CRM ודשבורד חי</h3>
+      <p>כל הפייפליין במסך אחד — מי ממתין, מי בפגישה, מי עומד לחתום. מעקב בזמן אמת.</p>
+      <span class="feature-roi">↑ החלטות מבוססות נתונים</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h3>שיווק אוטומטי</h3>
+      <p>לכל פרויקט חדש — נוצרים אוטומטית פוסטים, ניוזלטר ועמוד נחיתה מותאם.</p>
+      <span class="feature-roi">↑ פרסום ללא עלות כוח אדם</span>
+    </div>
+  </div>
+</section>
+
+<!-- MOCK CRM DEMO -->
+<section class="section" id="demo">
+  <div class="section-tag">דמו חי</div>
+  <div class="section-title">כך נראית מערכת ניהול הלידים</div>
+  <div class="section-sub">דשבורד בזמן אמת — כל ליד, כל עסקה, כל פעולת בוט.</div>
+
+  <div class="crm-wrapper">
+    <div class="crm-bar">
+      <div class="crm-dot" style="background:#ff5f57"></div>
+      <div class="crm-dot" style="background:#febc2e"></div>
+      <div class="crm-dot" style="background:#28c840"></div>
+      <div class="crm-bar-title">geffen-global.crm — מאי 2026</div>
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(46,213,115,0.12);border:1px solid rgba(46,213,115,0.3);border-radius:12px;padding:4px 12px;">
+        <div style="width:7px;height:7px;background:#2ed573;border-radius:50%;animation:pulse 1.8s infinite"></div>
+        <span style="color:#2ed573;font-size:12px">בוט פעיל</span>
+      </div>
+    </div>
+
+    <div class="crm-kpis">
+      <div class="crm-kpi">
+        <div class="crm-kpi-label">לידים החודש</div>
+        <div class="crm-kpi-val">47</div>
+        <div class="crm-kpi-change">↑ +18% מהחודש שעבר</div>
+      </div>
+      <div class="crm-kpi">
+        <div class="crm-kpi-label">פגישות — הבוט קבע</div>
+        <div class="crm-kpi-val">12</div>
+        <div class="crm-kpi-change gold">מתוך 23 סה"כ</div>
+      </div>
+      <div class="crm-kpi">
+        <div class="crm-kpi-label">עסקאות שנחתמו</div>
+        <div class="crm-kpi-val">8</div>
+        <div class="crm-kpi-change">שווי €1.6M</div>
+      </div>
+      <div class="crm-kpi">
+        <div class="crm-kpi-label">זמן מענה ממוצע</div>
+        <div class="crm-kpi-val">28″</div>
+        <div class="crm-kpi-change">לעומת 4 שעות לפני</div>
+      </div>
+    </div>
+
+    <div class="crm-table-wrap">
+      <table class="crm-table">
+        <thead>
+          <tr>
+            <th>לקוח</th>
+            <th>פרויקט</th>
+            <th>תקציב</th>
+            <th>סטטוס</th>
+            <th>טופל ע"י</th>
+            <th>עדכון אחרון</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="crm-name">דני לוי</td>
+            <td>Nea Iraklia Villas</td>
+            <td>€150K</td>
+            <td><span class="crm-badge meet">📅 פגישה נקבעה</span></td>
+            <td><span class="bot-tag">🤖 בוט</span></td>
+            <td>לפני 12 דק'</td>
+          </tr>
+          <tr>
+            <td class="crm-name">רחל כהן</td>
+            <td>Halkidiki The Pearl</td>
+            <td>€200K</td>
+            <td><span class="crm-badge hot">🔥 ליד חם</span></td>
+            <td><span class="bot-tag">🤖 בוט</span></td>
+            <td>לפני 1 שעה</td>
+          </tr>
+          <tr>
+            <td class="crm-name">נועה ביטון</td>
+            <td>Nea Iraklia Villas</td>
+            <td>€220K</td>
+            <td><span class="crm-badge signed">✅ נחתם</span></td>
+            <td><span class="bot-tag">🤖 בוט</span></td>
+            <td>אתמול</td>
+          </tr>
+          <tr>
+            <td class="crm-name">אלון פרץ</td>
+            <td>Halkidiki The Pearl</td>
+            <td>€300K</td>
+            <td><span class="crm-badge new">🆕 חדש</span></td>
+            <td><span class="bot-tag">🤖 בוט</span></td>
+            <td>לפני 3 שע'</td>
+          </tr>
+          <tr>
+            <td class="crm-name">שרה גולדברג</td>
+            <td>Neoi Epivates Sea Front</td>
+            <td>€180K</td>
+            <td><span class="crm-badge meet">📅 פגישה נקבעה</span></td>
+            <td><span class="bot-tag">🤖 בוט</span></td>
+            <td>הבוקר</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ROI -->
+<section class="section section-alt" id="roi">
+  <div class="section-tag">החזר השקעה</div>
+  <div class="section-title">המספרים מדברים בעד עצמם</div>
+  <div class="section-sub">בעסק של נדל"ן — עסקה אחת שנשמרה מכסה את כל ההשקעה.</div>
+  <div class="roi-grid">
+    <div class="roi-card">
+      <div class="roi-icon">⚡</div>
+      <div class="roi-num">×8</div>
+      <div class="roi-label">מהירות מענה ללידים</div>
+      <div class="roi-desc">מ-4 שעות ל-30 שניות. בנדל"ן, הראשון שעונה — מקבל את הפגישה.</div>
+    </div>
+    <div class="roi-card highlight">
+      <div class="roi-icon">💰</div>
+      <div class="roi-num">+2–3</div>
+      <div class="roi-label">עסקאות נוספות בחודש</div>
+      <div class="roi-desc">לידים שהיו הולכים לאיבוד — נסגרים. כל עסקה ממוצעת = €150–300K.</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-icon">🕐</div>
+      <div class="roi-num">20+</div>
+      <div class="roi-label">שעות שחוזרות לצוות בשבוע</div>
+      <div class="roi-desc">פגישות, דוחות ופולואו-אפ — כולם אוטומטיים. הצוות מוכר, לא מתפעל.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAN -->
+<section class="section" id="plan">
+  <div class="section-tag">תוכנית עבודה</div>
+  <div class="section-title">שני שלבים. תוצאות מהיום הראשון.</div>
+  <div class="section-sub">התחלה בהתקנה חד-פעמית + ריטיינר חודשי לתחזוקה ושיפור מתמיד.</div>
+  <div class="plan-grid">
+    <div class="plan-card">
+      <div class="plan-name">שלב א' — התקנה</div>
+      <div class="plan-price">חד-פעמי</div>
+      <div class="plan-period">תשלום אחד · הכל כלול</div>
+      <ul class="plan-list">
+        <li><span>✓</span>בוט ווטסאפ לסינון לידים</li>
+        <li><span>✓</span>CRM ודשבורד ניהול</li>
+        <li><span>✓</span>אוטומציית קביעת פגישות</li>
+        <li><span>✓</span>הגדרת כל הזרימות</li>
+        <li><span>✓</span>אימון הצוות</li>
+        <li><span>✓</span>תמיכה בהשקה — חודש ראשון</li>
+      </ul>
+      <button class="plan-btn outline">לפרטים נוספים</button>
+    </div>
+    <div class="plan-card featured">
+      <div class="plan-featured-tag">מומלץ</div>
+      <div class="plan-name">שלב ב' — ריטיינר</div>
+      <div class="plan-price">חודשי</div>
+      <div class="plan-period">תשלום חודשי · ללא התחייבות ארוכה</div>
+      <ul class="plan-list">
+        <li><span>✓</span>תחזוקה שוטפת של כל המערכות</li>
+        <li><span>✓</span>שיפורים ועדכונים חודשיים</li>
+        <li><span>✓</span>דוחות ביצועים חודשיים</li>
+        <li><span>✓</span>הוספת אוטומציות חדשות לפי צורך</li>
+        <li><span>✓</span>תמיכה טכנית עדיפות גבוהה</li>
+        <li><span>✓</span>ייעוץ AI ואסטרטגיה שוטפת</li>
+      </ul>
+      <button class="plan-btn filled">בואו נתחיל</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 גפן גלובל — מערכת אוטומציות</span>
+  <span class="footer-brand">⚡ AI Automations</span>
+</footer>
+
+</body>
+</html>
